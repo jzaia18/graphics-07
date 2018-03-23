@@ -1,0 +1,83 @@
+ident
+torus
+227 264 259 6 21
+rotate
+z 268
+apply
+torus
+222 266 295 9 24
+rotate
+y 313
+apply
+torus
+253 233 215 12 21
+rotate
+y 276
+apply
+torus
+276 226 235 9 24
+rotate
+x 233
+apply
+torus
+225 277 296 8 21
+rotate
+z 153
+apply
+torus
+202 222 286 12 26
+rotate
+x 318
+apply
+torus
+210 232 211 13 25
+rotate
+z 352
+apply
+torus
+281 249 255 12 26
+rotate
+z 42
+apply
+torus
+211 236 212 7 28
+rotate
+y 343
+apply
+torus
+228 300 231 8 24
+rotate
+x 46
+apply
+torus
+253 218 223 12 30
+rotate
+x 38
+apply
+torus
+278 274 290 14 26
+rotate
+y 48
+apply
+torus
+271 245 279 12 24
+rotate
+x 171
+apply
+torus
+264 292 272 14 25
+rotate
+x 97
+apply
+torus
+287 298 240 9 30
+rotate
+z 63
+scale
+0.6 0.6 0.6
+move
+150 150 0
+apply
+display
+save
+donuts.png
