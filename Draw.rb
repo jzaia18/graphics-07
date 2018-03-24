@@ -136,18 +136,22 @@ module Draw
 
   # x,y,z on top left front corner
   def self.box(x, y, z, width, height, depth)
-    add_edge(x, y, z, x + width, y, z)
-    add_edge(x, y - height, z, x + width, y - height, z)
-    add_edge(x + width, y, z, x + width, y - height, z)
-    add_edge(x, y, z, x, y - height, z)
-    add_edge(x, y, z - depth, x + width, y, z - depth)
-    add_edge(x, y - height, z - depth, x + width, y - height, z - depth)
-    add_edge(x + width, y, z - depth, x + width, y - height, z - depth)
-    add_edge(x, y, z - depth, x, y - height, z - depth)
-    add_edge(x, y, z, x, y, z - depth)
-    add_edge(x, y - height, z, x, y - height, z - depth)
-    add_edge(x + width, y, z, x + width, y, z - depth)
-    add_edge(x + width, y - height, z, x + width, y - height, z - depth)
+    #FRONT FACE
+    add_polygon(x, y, z,   x, y - height, z,   x + width, y, z)
+    add_polygon(x + width, y, z,   x + width, y - height, z,   x, y - height, z)
+
+    # add_edge(x, y, z, x + width, y, z)
+    # add_edge(x, y - height, z, x + width, y - height, z)
+    # add_edge(x + width, y, z, x + width, y - height, z)
+    # add_edge(x, y, z, x, y - height, z)
+    # add_edge(x, y, z - depth, x + width, y, z - depth)
+    # add_edge(x, y - height, z - depth, x + width, y - height, z - depth)
+    # add_edge(x + width, y, z - depth, x + width, y - height, z - depth)
+    # add_edge(x, y, z - depth, x, y - height, z - depth)
+    # add_edge(x, y, z, x, y, z - depth)
+    # add_edge(x, y - height, z, x, y - height, z - depth)
+    # add_edge(x + width, y, z, x + width, y, z - depth)
+    # add_edge(x + width, y - height, z, x + width, y - height, z - depth)
   end
 
   # Connects a matrix of points in a sphere-like fashion (requires gen_sphere())
@@ -205,17 +209,24 @@ module Draw
   end
 
   # Helper for add_edge
-  def self.add_point(x, y, z)
-    $EDGE_MAT.add_col([x, y, z, 1])
+  def self.add_point(x, y, z, mat)
+    mat.add_col([x, y, z, 1])
   end
 
   # Add an edge to the global edge matrix
-  def self.add_edge(x0, y0, z0, x1, y1, z1)
-    add_point(x0, y0, z0)
-    add_point(x1, y1, z1)
+  def self.add_edge(x0, y0, z0, x1, y1, z1, mat: $EDGE_MAT)
+    add_point(x0, y0, z0, mat)
+    add_point(x1, y1, z1, mat)
   end
 
-  # Draw the pixels in the matrix and clean it out
+  # Add a trangle to the global polygon matrix
+  def self.add_polygon(x0, y0, z0, x1, y1, z1, x2, y2, z2, mat: $POLY_MAT)
+    add_point(x0, y0, z0, mat)
+    add_point(x1, y1, z1, mat)
+    add_point(x2, y2, z2, mat)
+  end
+
+  # Draw the pixels in the matrix
   def self.push_edge_matrix(edgemat: $EDGE_MAT)
     i = 0
     while i < edgemat.cols
@@ -225,6 +236,20 @@ module Draw
       i+=2
     end
     #edgemat.reset(4,0)
+  end
+
+  # Draw the pixels in the matrix
+  def self.push_polygon_matrix(polymat: $POLY_MAT)
+    i = 0
+    while i < polymat.cols
+      coord0 = polymat.get_col(i)
+      coord1 = polymat.get_col(i + 1)
+      coord2 = polymat.get_col(i + 2)
+      line(coord0[0].to_i, coord0[1].to_i, coord1[0].to_i, coord1[1].to_i)
+      line(coord1[0].to_i, coord1[1].to_i, coord2[0].to_i, coord2[1].to_i)
+      line(coord2[0].to_i, coord2[1].to_i, coord0[0].to_i, coord0[1].to_i)
+      i+=3
+    end
   end
 
 end

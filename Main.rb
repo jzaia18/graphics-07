@@ -10,7 +10,7 @@ $TAU = PI*2
 
 # Changeable
 $RESOLUTION = 500 # All images are squares
-$DEBUGGING = false
+$DEBUGGING = true
 $BACKGROUND_COLOR = [255, 255, 224] # [r, g, b]
 $DRAW_COLOR = [255, 105, 180] # [r, g, b]
 $INFILE = "script"
@@ -22,6 +22,7 @@ $dt = 0.05 # The amount that the parametric t is incremented by on each loop
 $GRID = Utils.create_grid()
 $TRAN_MAT = MatrixUtils.identity(4) # Transformations matrix
 $EDGE_MAT = Matrix.new(4, 0) # Edge matrix
+$POLY_MAT = Matrix.new(4, 0) # Polygon matrix
 $RC = $DRAW_COLOR[0] # Red component
 $GC = $DRAW_COLOR[1]
 $BC = $DRAW_COLOR[2]

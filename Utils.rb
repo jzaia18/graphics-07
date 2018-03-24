@@ -15,12 +15,16 @@ module Utils
 
 
   ## Write GRID to OUTFILE
-  def self.write_out(file: $OUTFILE, edgemat: $EDGE_MAT)
+  def self.write_out(file: $OUTFILE, mat: $POLY_MAT, polygon_mode: true)
     puts "Writing out to #{file}" if $DEBUGGING
     extension = file.dup #filename with any extension
     file[file.index('.')..-1] = '.ppm'
     $GRID = create_grid()
-    Draw.push_edge_matrix(edgemat: edgemat)
+    if polygon_mode
+      Draw.push_polygon_matrix(polymat: mat)
+    else
+      Draw.push_edge_matrix(edgemat: mat)
+    end
     outfile = File.open(file, 'w')
     outfile.puts "P3 #$RESOLUTION #$RESOLUTION 255" #Header in 1 line
 
@@ -47,11 +51,11 @@ module Utils
     write_out(file: tempfile)
     puts %x[display #{tempfile}]
     puts %x[rm #{tempfile}]
-    $GRID = create_grid() #IAM THE PROBLEM (MAYBE)
+    $GRID = create_grid()
   end
 
-  def self.apply_transformations(edge_mat: $EDGE_MAT, tran_mat: $TRAN_MAT)
-    MatrixUtils.multiply(tran_mat, edge_mat)
+  def self.apply_transformations(mat: $POLY_MAT, tran_mat: $TRAN_MAT)
+    MatrixUtils.multiply(tran_mat, mat)
   end
 
   def self.parse_file(filename: $INFILE)
@@ -97,6 +101,7 @@ module Utils
         Draw.torus(args[0], args[1], args[2], args[3], args[4])
       when "clear"
         $EDGE_MAT = Matrix.new(4, 0)
+        $POLY_MAT = Matrix.new(4, 0)
       when "ident"
         $TRAN_MAT = MatrixUtils.identity(4)
       when "scale"
