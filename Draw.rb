@@ -165,9 +165,11 @@ module Draw
   # Connects a matrix of points in a sphere-like fashion (requires gen_sphere())
   def self.sphere(cx, cy, cz, r)
     points = gen_sphere(cx, cy, cz, r)
-    for i in (0...points.cols)
+    i = 0
+    while i < points.cols
       p = points.get_col(i) # one single point
       add_edge(p[0], p[1], p[2], p[0], p[1], p[2])
+      i += 1
     end
   end
 
@@ -192,9 +194,11 @@ module Draw
   # Connects a matrix of points in a torus-like fashion (requires gen_torus())
   def self.torus(cx, cy, cz, r1, r2)
     points = gen_torus(cx, cy, cz, r1, r2)
-    for i in (0...points.cols)
+    i = 0
+    while i < points.cols
       p = points.get_col(i) # one single point
       add_edge(p[0], p[1], p[2], p[0], p[1], p[2])
+      i += 1
     end
   end
 
