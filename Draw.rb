@@ -1,4 +1,3 @@
-
 require './MatrixUtils.rb'
 
 module Draw
