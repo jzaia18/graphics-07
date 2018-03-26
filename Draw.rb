@@ -1,3 +1,4 @@
+
 require './MatrixUtils.rb'
 
 module Draw
@@ -140,18 +141,25 @@ module Draw
     add_polygon(x, y, z,   x, y - height, z,   x + width, y, z)
     add_polygon(x + width, y, z,   x + width, y - height, z,   x, y - height, z)
 
-    # add_edge(x, y, z, x + width, y, z)
-    # add_edge(x, y - height, z, x + width, y - height, z)
-    # add_edge(x + width, y, z, x + width, y - height, z)
-    # add_edge(x, y, z, x, y - height, z)
-    # add_edge(x, y, z - depth, x + width, y, z - depth)
-    # add_edge(x, y - height, z - depth, x + width, y - height, z - depth)
-    # add_edge(x + width, y, z - depth, x + width, y - height, z - depth)
-    # add_edge(x, y, z - depth, x, y - height, z - depth)
-    # add_edge(x, y, z, x, y, z - depth)
-    # add_edge(x, y - height, z, x, y - height, z - depth)
-    # add_edge(x + width, y, z, x + width, y, z - depth)
-    # add_edge(x + width, y - height, z, x + width, y - height, z - depth)
+    #TOP FACE
+    add_polygon(x, y, z,   x, y, z - depth,    x + width, y, z)
+    add_polygon(x + width, y, z,   x, y, z - depth,   x + width, y, z - depth)
+
+    #LEFT FACE
+    add_polygon(x, y, z,   x, y - height, z,   x, y, z - depth)
+    add_polygon(x, y, z - depth,   x, y - height, z,   x, y - height, z - depth)
+
+    #BACK FACE
+    add_polygon(x + width, y, z - depth,   x, y - height, z - depth,   x, y, z - depth)
+    add_polygon(x, y - height, z - depth,   x + width, y - height, z - depth,   x + width, y, z - depth)
+
+    #BOTTOM FACE
+    add_polygon(x + width, y - height, z,   x, y - height, z - depth,    x, y - height, z)
+    add_polygon(x + width, y - height, z - depth,   x, y - height, z - depth,   x + width, y - height, z)
+
+    #RIGHT FACE
+    add_polygon(x + width, y, z - depth,   x + width, y - height, z,   x + width, y, z)
+    add_polygon(x + width, y - height, z - depth,   x + width, y - height, z,   x + width, y, z - depth)
   end
 
   # Connects a matrix of points in a sphere-like fashion (requires gen_sphere())
