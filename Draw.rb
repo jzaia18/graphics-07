@@ -165,9 +165,23 @@ module Draw
   def self.sphere(cx, cy, cz, r)
     points = gen_sphere(cx, cy, cz, r)
     i = 0
+    layer_increment = (1/$dt + 1).to_i
     while i < points.cols
-      p = points.get_col(i) # one single point
-      add_edge(p[0], p[1], p[2], p[0], p[1], p[2])
+      if i%layer_increment == layer_increment-1
+         i += 1
+         next
+      end
+      p0 = points.get_col(i) # this point
+      p1 = points.get_col((i + 1)%points.cols) # next point
+      p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
+      #add_polygon(p0[0], p0[1], p0[2], p0[0], p0[1], p0[2], p0[0], p0[1], p0[2])
+      add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
+
+      p0 = points.get_col(i) # this point
+      p1 = points.get_col((i + layer_increment + 1)%points.cols)
+      p2 = points.get_col((i + layer_increment)%points.cols)
+      #add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
+
       i += 1
     end
   end
@@ -176,16 +190,16 @@ module Draw
   def self.gen_sphere(cx, cy, cz, r)
     ret = Matrix.new(3, 0)
     phi = 0
-    while phi < $TAU
+    while phi < $TAU / 5
       theta = 0
-      while theta < PI
-        x = r*cos(theta) + cx
-        y = r*sin(theta)*cos(phi) + cy
-        z = r*sin(theta)*sin(phi) + cz
+      while theta <= 1
+        x = r*cos(theta*PI) + cx
+        y = r*sin(theta*PI)*cos(phi) + cy
+        z = r*sin(theta*PI)*sin(phi) + cz
         ret.add_col([x, y, z])
         theta += $dt
       end
-      phi += $dt
+      phi += $dt*$TAU
     end
     return ret
   end
