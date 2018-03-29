@@ -1,4 +1,5 @@
 require './MatrixUtils.rb'
+require './VectorUtils.rb'
 
 module Draw
 
@@ -205,10 +206,14 @@ module Draw
   # Connects a matrix of points in a torus-like fashion (requires gen_torus())
   def self.torus(cx, cy, cz, r1, r2)
     points = gen_torus(cx, cy, cz, r1, r2)
+    layer_increment = (1/$dt).to_i
     i = 0
     while i < points.cols
-      p = points.get_col(i) # one single point
-      add_edge(p[0], p[1], p[2], p[0], p[1], p[2])
+      p0 = points.get_col((i)%points.cols) # one single point
+      p1 = points.get_col((i+layer_increment)%points.cols) # the same point 1 rotation back
+      p2 = points.get_col((i+1)%points.cols) # the next point
+
+      add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
       i += 1
     end
   end
@@ -224,9 +229,9 @@ module Draw
         y = r1 * sin(theta) + cy
         z = -1 * (r1 * cos(theta) + r2) * sin(phi) + cz
         ret.add_col([x, y, z])
-        theta += $dt
+        theta += $dt * $TAU
       end
-      phi += $dt
+      phi += $dt * $TAU
     end
     return ret
   end
@@ -258,7 +263,6 @@ module Draw
       line(coord0[0].to_i, coord0[1].to_i, coord1[0].to_i, coord1[1].to_i)
       i+=2
     end
-    #edgemat.reset(4,0)
   end
 
   # Draw the pixels in the matrix
@@ -268,11 +272,20 @@ module Draw
       coord0 = polymat.get_col(i)
       coord1 = polymat.get_col(i + 1)
       coord2 = polymat.get_col(i + 2)
-      line(coord0[0].to_i, coord0[1].to_i, coord1[0].to_i, coord1[1].to_i)
-      line(coord1[0].to_i, coord1[1].to_i, coord2[0].to_i, coord2[1].to_i)
-      line(coord2[0].to_i, coord2[1].to_i, coord0[0].to_i, coord0[1].to_i)
+      if (not cull_polygon?(coord0, coord1, coord2))
+        line(coord0[0].to_i, coord0[1].to_i, coord1[0].to_i, coord1[1].to_i)
+        line(coord1[0].to_i, coord1[1].to_i, coord2[0].to_i, coord2[1].to_i)
+        line(coord2[0].to_i, coord2[1].to_i, coord0[0].to_i, coord0[1].to_i)
+      end
       i+=3
     end
+  end
+
+  #Return a boolean, if the edge should be culled
+  def self.cull_polygon?(p0, p1, p2)
+    b = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]]
+    a = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]]
+    VectorUtils.cross_product(a, b)[2] < 0
   end
 
 end
