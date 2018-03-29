@@ -174,13 +174,11 @@ module Draw
       p0 = points.get_col(i) # this point
       p1 = points.get_col((i + 1)%points.cols) # next point
       p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
-      #add_polygon(p0[0], p0[1], p0[2], p0[0], p0[1], p0[2], p0[0], p0[1], p0[2])
       add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
 
       p0 = points.get_col(i) # this point
       p1 = points.get_col((i + layer_increment + 1)%points.cols)
       p2 = points.get_col((i + layer_increment)%points.cols)
-      #add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
 
       i += 1
     end
@@ -190,7 +188,7 @@ module Draw
   def self.gen_sphere(cx, cy, cz, r)
     ret = Matrix.new(3, 0)
     phi = 0
-    while phi < $TAU / 5
+    while phi < $TAU
       theta = 0
       while theta <= 1
         x = r*cos(theta*PI) + cx
