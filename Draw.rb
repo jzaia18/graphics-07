@@ -136,30 +136,23 @@ module Draw
 
 
   # x,y,z on top left front corner
-  def self.box(x, y, z, width, height, depth)
-    #FRONT FACE
-    add_polygon(x, y, z,   x, y - height, z,   x + width, y, z)
-    add_polygon(x + width, y, z,   x + width, y - height, z,   x, y - height, z)
+  def self.box(x0, y0, z0, width, height, depth)
+    x1 = x0 + width
+    y1 = y0 - height
+    z1 = z0 - depth
 
-    #TOP FACE
-    add_polygon(x, y, z,   x, y, z - depth,    x + width, y, z)
-    add_polygon(x + width, y, z,   x, y, z - depth,   x + width, y, z - depth)
-
-    #LEFT FACE
-    add_polygon(x, y, z,   x, y - height, z,   x, y, z - depth)
-    add_polygon(x, y, z - depth,   x, y - height, z,   x, y - height, z - depth)
-
-    #BACK FACE
-    add_polygon(x + width, y, z - depth,   x, y - height, z - depth,   x, y, z - depth)
-    add_polygon(x, y - height, z - depth,   x + width, y - height, z - depth,   x + width, y, z - depth)
-
-    #BOTTOM FACE
-    add_polygon(x + width, y - height, z,   x, y - height, z - depth,    x, y - height, z)
-    add_polygon(x + width, y - height, z - depth,   x, y - height, z - depth,   x + width, y - height, z)
-
-    #RIGHT FACE
-    add_polygon(x + width, y, z - depth,   x + width, y - height, z,   x + width, y, z)
-    add_polygon(x + width, y - height, z - depth,   x + width, y - height, z,   x + width, y, z - depth)
+    add_polygon(x0, y0, z0,   x1, y1, z0,   x1, y0, z0) # Front
+    add_polygon(x0, y0, z0,   x0, y1, z0,   x1, y1, z0)
+    add_polygon(x1, y0, z1,   x0, y1, z1,   x0, y0, z1) # Back
+    add_polygon(x1, y0, z1,   x1, y1, z1,   x0, y1, z1)
+    add_polygon(x1, y0, z0,   x1, y1, z1,   x1, y0, z1) # Right
+    add_polygon(x1, y0, z0,   x1, y1, z0,   x0, y0, z0)
+    add_polygon(x0, y0, z1,   x0, y1, z0,   x0, y0, z0) # Left
+    add_polygon(x0, y0, z1,   x0, y1, z1,   x0, y1, z0)
+    add_polygon(x0, y0, z1,   x1, y0, z0,   x1, y0, z1) # Top
+    add_polygon(x0, y0, z1,   x0, y0, z0,   x1, y0, z0)
+    add_polygon(x0, y1, z0,   x1, y1, z1,   x1, y1, z0) # Bottom
+    add_polygon(x0, y1, z0,   x0, y1, z1,   x1, y1, z1)
   end
 
   # Connects a matrix of points in a sphere-like fashion (requires gen_sphere())
@@ -167,19 +160,17 @@ module Draw
     points = gen_sphere(cx, cy, cz, r)
     i = 0
     layer_increment = (1/$dt + 1).to_i
-    while i < points.cols
+    while i < points.cols - 1
       if i%layer_increment == layer_increment-1
          i += 1
          next
       end
       p0 = points.get_col(i) # this point
-      p1 = points.get_col((i + 1)%points.cols) # next point
+      p1 = points.get_col(i + 1) # next point
       p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
+      p3 = points.get_col((i + layer_increment)%points.cols)
       add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
-
-      p0 = points.get_col(i) # this point
-      p1 = points.get_col((i + layer_increment + 1)%points.cols)
-      p2 = points.get_col((i + layer_increment)%points.cols)
+      add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p3[0], p3[1], p3[2])
 
       i += 1
     end
@@ -189,16 +180,16 @@ module Draw
   def self.gen_sphere(cx, cy, cz, r)
     ret = Matrix.new(3, 0)
     phi = 0
-    while phi < $TAU
+    while phi < 1
       theta = 0
       while theta <= 1
         x = r*cos(theta*PI) + cx
-        y = r*sin(theta*PI)*cos(phi) + cy
-        z = r*sin(theta*PI)*sin(phi) + cz
+        y = r*sin(theta*PI)*cos(phi*$TAU) + cy
+        z = r*sin(theta*PI)*sin(phi*$TAU) + cz
         ret.add_col([x, y, z])
         theta += $dt
       end
-      phi += $dt*$TAU
+      phi += $dt
     end
     return ret
   end
@@ -208,12 +199,18 @@ module Draw
     points = gen_torus(cx, cy, cz, r1, r2)
     layer_increment = (1/$dt).to_i
     i = 0
-    while i < points.cols
-      p0 = points.get_col((i)%points.cols) # one single point
-      p1 = points.get_col((i+layer_increment)%points.cols) # the same point 1 rotation back
-      p2 = points.get_col((i+1)%points.cols) # the next point
+    while i < points.cols - 1
+      if i%layer_increment == layer_increment-1
+         i += 1
+         next
+      end
+      p0 = points.get_col(i) # this point
+      p1 = points.get_col(i + 1) # next point
+      p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
+      p3 = points.get_col((i + layer_increment)%points.cols)
+      add_polygon(p0[0], p0[1], p0[2], p3[0], p3[1], p3[2], p2[0], p2[1], p2[2])
+      add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2])
 
-      add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
       i += 1
     end
   end
@@ -272,7 +269,7 @@ module Draw
       coord0 = polymat.get_col(i)
       coord1 = polymat.get_col(i + 1)
       coord2 = polymat.get_col(i + 2)
-      if (not cull_polygon?(coord0, coord1, coord2))
+      if (calc_normal(coord0, coord1, coord2)[2] > 0)
         line(coord0[0].to_i, coord0[1].to_i, coord1[0].to_i, coord1[1].to_i)
         line(coord1[0].to_i, coord1[1].to_i, coord2[0].to_i, coord2[1].to_i)
         line(coord2[0].to_i, coord2[1].to_i, coord0[0].to_i, coord0[1].to_i)
@@ -282,10 +279,10 @@ module Draw
   end
 
   #Return a boolean, if the edge should be culled
-  def self.cull_polygon?(p0, p1, p2)
-    b = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]]
-    a = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]]
-    VectorUtils.cross_product(a, b)[2] < 0
+  def self.calc_normal(p0, p1, p2)
+    a = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]]
+    b = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]]
+    return VectorUtils.cross_product(a, b)
   end
 
 end
