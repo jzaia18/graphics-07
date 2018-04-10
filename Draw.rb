@@ -182,7 +182,7 @@ module Draw
     phi = 0
     while phi < 1
       theta = 0
-      while theta <= 1
+      while theta < 1
         x = r*cos(theta*PI) + cx
         y = r*sin(theta*PI)*cos(phi*$TAU) + cy
         z = r*sin(theta*PI)*sin(phi*$TAU) + cz
@@ -200,14 +200,14 @@ module Draw
     layer_increment = (1/$dt).to_i
     i = 0
     while i < points.cols - 1
-      if i%layer_increment == layer_increment-1
-         i += 1
-         next
-      end
+      # if i%layer_increment == layer_increment - 1
+      #    i += 1
+      #    next
+      # end
       p0 = points.get_col(i) # this point
       p1 = points.get_col(i + 1) # next point
-      p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
-      p3 = points.get_col((i + layer_increment)%points.cols)
+      p2 = points.get_col((i + layer_increment + 2)%points.cols) # same point on next slice
+      p3 = points.get_col((i + layer_increment + 1)%points.cols)
       add_polygon(p0[0], p0[1], p0[2], p3[0], p3[1], p3[2], p2[0], p2[1], p2[2])
       add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2])
 
@@ -221,7 +221,7 @@ module Draw
     phi = 0
     while phi < $TAU
       theta = 0
-      while theta < $TAU
+      while theta <= $TAU
         x = (r1 * cos(theta) + r2) * cos(phi) + cx
         y = r1 * sin(theta) + cy
         z = -1 * (r1 * cos(theta) + r2) * sin(phi) + cz
@@ -278,7 +278,7 @@ module Draw
     end
   end
 
-  #Return a boolean, if the edge should be culled
+  # Given a triangle, calculate its normal
   def self.calc_normal(p0, p1, p2)
     a = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]]
     b = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]]
