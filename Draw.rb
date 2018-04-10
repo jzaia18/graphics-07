@@ -197,7 +197,7 @@ module Draw
   # Connects a matrix of points in a torus-like fashion (requires gen_torus())
   def self.torus(cx, cy, cz, r1, r2)
     points = gen_torus(cx, cy, cz, r1, r2)
-    layer_increment = (1/$dt).to_i
+    layer_increment = (1/$dt).to_i + 1
     i = 0
     while i < points.cols - 1
       # if i%layer_increment == layer_increment - 1
@@ -206,8 +206,8 @@ module Draw
       # end
       p0 = points.get_col(i) # this point
       p1 = points.get_col(i + 1) # next point
-      p2 = points.get_col((i + layer_increment + 2)%points.cols) # same point on next slice
-      p3 = points.get_col((i + layer_increment + 1)%points.cols)
+      p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
+      p3 = points.get_col((i + layer_increment)%points.cols)
       add_polygon(p0[0], p0[1], p0[2], p3[0], p3[1], p3[2], p2[0], p2[1], p2[2])
       add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2])
 
