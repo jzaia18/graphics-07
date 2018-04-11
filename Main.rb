@@ -10,7 +10,7 @@ $TAU = PI*2
 
 # Changeable
 $RESOLUTION = 500 # All images are squares
-$DEBUGGING = true
+$DEBUGGING = false
 $BACKGROUND_COLOR = [255, 255, 224] # [r, g, b]
 $DRAW_COLOR = [255, 105, 180] # [r, g, b]
 $INFILE = "script"

@@ -160,19 +160,14 @@ module Draw
     points = gen_sphere(cx, cy, cz, r)
     i = 0
     layer_increment = (1/$dt + 1).to_i
-    while i < points.cols - 1
-      if i%layer_increment == layer_increment-1
-         i += 1
-         next
-      end
-      p0 = points.get_col(i) # this point
-      p1 = points.get_col(i + 1) # next point
-      p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
+    for i in 0...points.cols
+      next if i%layer_increment == layer_increment-1
+      p0 = points.get_col(i)
+      p1 = points.get_col(i + 1)
+      p2 = points.get_col((i + layer_increment + 1)%points.cols)
       p3 = points.get_col((i + layer_increment)%points.cols)
       add_polygon(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2])
       add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p3[0], p3[1], p3[2])
-
-      i += 1
     end
   end
 
@@ -182,10 +177,12 @@ module Draw
     phi = 0
     while phi < 1
       theta = 0
+      _phi = phi*$TAU
       while theta < 1
-        x = r*cos(theta*PI) + cx
-        y = r*sin(theta*PI)*cos(phi*$TAU) + cy
-        z = r*sin(theta*PI)*sin(phi*$TAU) + cz
+        _theta = theta*PI
+        x = r*cos(_theta) + cx
+        y = r*sin(_theta)*cos(_phi) + cy
+        z = r*sin(_theta)*sin(_phi) + cz
         ret.add_col([x, y, z])
         theta += $dt
       end
@@ -197,21 +194,16 @@ module Draw
   # Connects a matrix of points in a torus-like fashion (requires gen_torus())
   def self.torus(cx, cy, cz, r1, r2)
     points = gen_torus(cx, cy, cz, r1, r2)
-    layer_increment = (1/$dt).to_i + 1
-    i = 0
-    while i < points.cols - 1
-      # if i%layer_increment == layer_increment - 1
-      #    i += 1
-      #    next
-      # end
-      p0 = points.get_col(i) # this point
-      p1 = points.get_col(i + 1) # next point
-      p2 = points.get_col((i + layer_increment + 1)%points.cols) # same point on next slice
-      p3 = points.get_col((i + layer_increment)%points.cols)
-      add_polygon(p0[0], p0[1], p0[2], p3[0], p3[1], p3[2], p2[0], p2[1], p2[2])
-      add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2])
-
-      i += 1
+    layer_increment = (1/$dt + 1).to_i
+    for i in 0...(layer_increment-1)
+      for j in 0...(layer_increment-1)
+        p0 = points.get_col( i*layer_increment + j)
+        p1 = points.get_col( i*layer_increment + j + 1)
+        p2 = points.get_col((i*layer_increment + j + layer_increment + 1)%points.cols)
+        p3 = points.get_col((i*layer_increment + j + layer_increment)%points.cols)
+        add_polygon(p0[0], p0[1], p0[2], p3[0], p3[1], p3[2], p2[0], p2[1], p2[2])
+        add_polygon(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2])
+      end
     end
   end
 
